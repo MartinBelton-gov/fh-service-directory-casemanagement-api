@@ -2,6 +2,7 @@ using FamilyHubs.ServiceDirectoryCaseManagement.Core;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Interceptors;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Repository;
 using FamilyHubs.SharedKernel.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -19,7 +20,6 @@ public abstract class BaseEfRepositoryTestFixture
         var mockDateTime = new Mock<IDateTime>();
         var mockCurrentUserService = new Mock<ICurrentUserService>();
         var auditableEntitySaveChangesInterceptor = new AuditableEntitySaveChangesInterceptor(mockCurrentUserService.Object, mockDateTime.Object);
-
 
         DbContext = new ApplicationDbContext(options, mockEventDispatcher.Object, auditableEntitySaveChangesInterceptor);
     }

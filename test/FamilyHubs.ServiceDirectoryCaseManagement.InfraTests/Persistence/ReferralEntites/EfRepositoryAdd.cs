@@ -1,11 +1,8 @@
 ﻿using AutoFixture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FamilyHubs.ServiceDirectoryCaseManagement.Core.Entities;
+using FamilyHubs.ServiceDirectoryCaseManagement.Core.Events;
 using FamilyHubs.ServiceDirectoryCaseManagement.UnitTests;
+using FluentAssertions;
 
 namespace FamilyHubs.ServiceDirectoryCaseManagement.InfraTests.Persistence.ReferralEntites;
 
@@ -24,6 +21,7 @@ public class WhenEfRepositoryAdd : BaseEfRepositoryTestFixture
         ArgumentNullException.ThrowIfNull(repository, nameof(repository));
 
         // Act
+        referralItem.RegisterDomainEvent(new ReferralCreatedEvent(referralItem));
         await repository.AddAsync(referralItem);
 
         var addedReferralItem = await repository.GetByIdAsync(referralItem.Id);
@@ -32,8 +30,8 @@ public class WhenEfRepositoryAdd : BaseEfRepositoryTestFixture
         await repository.SaveChangesAsync();
 
         // Assert
-        Assert.Equal(referralItem, addedReferralItem);
-        Assert.True(!string.IsNullOrEmpty(addedReferralItem.Id));
+        referralItem.Should().BeEquivalentTo(addedReferralItem);
+        string.IsNullOrEmpty(addedReferralItem.Id).Should().BeFalse();
     }
     
 }
