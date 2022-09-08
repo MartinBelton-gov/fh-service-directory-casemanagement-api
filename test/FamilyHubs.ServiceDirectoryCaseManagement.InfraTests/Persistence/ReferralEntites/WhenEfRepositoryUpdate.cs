@@ -2,6 +2,8 @@
 using FamilyHubs.ServiceDirectoryCaseManagement.Core.Entities;
 using FamilyHubs.ServiceDirectoryCaseManagement.UnitTests;
 using Microsoft.EntityFrameworkCore;
+using FluentAssertions;
+using FamilyHubs.ServiceDirectoryCaseManagement.Core.Events;
 
 namespace FamilyHubs.ServiceDirectoryCaseManagement.InfraTests.Persistence.ReferralEntites;
 
@@ -25,20 +27,22 @@ public class WhenEfRepositoryUpdate : BaseEfRepositoryTestFixture
         var addedReferral = await repository.GetByIdAsync(referralItem.Id); // fetch the OpenReferralOrganisation and update its name
         if (addedReferral == null)
         {
-            Assert.NotNull(addedReferral);
+            addedReferral.Should().NotBeNull();
             return;
         }
 
-        Assert.NotSame(referralItem, addedReferral);
-
         // Act
-        addedReferral.ServiceName = "Brum Council";
+        addedReferral.ServiceName = "Brum1 Council";
+        addedReferral.RegisterDomainEvent(new ReferralUpdatedEvent(addedReferral));
+        referralItem.Should().NotBeEquivalentTo(addedReferral);
         await repository.UpdateAsync(addedReferral);
+
         var updatedOpenReferralOrganisation = await repository.GetByIdAsync(addedReferral.Id);
 
         // Assert
-        Assert.NotNull(updatedOpenReferralOrganisation);
-        Assert.NotEqual(referralItem.ServiceName, updatedOpenReferralOrganisation?.ServiceName);
-        Assert.Equal(referralItem.Id, updatedOpenReferralOrganisation?.Id);
+        updatedOpenReferralOrganisation.Should().NotBeNull();
+        ArgumentNullException.ThrowIfNull(referralItem, nameof(referralItem));
+        referralItem.ServiceName.Should().NotBeSameAs(updatedOpenReferralOrganisation?.ServiceName);
+        referralItem.Id.Should().BeEquivalentTo(updatedOpenReferralOrganisation?.Id);
     }
 }
