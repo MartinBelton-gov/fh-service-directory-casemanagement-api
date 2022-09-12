@@ -3,6 +3,8 @@ using FamilyHubs.ServiceDirectoryCaseManagement.Api.Endpoints;
 using FamilyHubs.ServiceDirectoryCaseManagement.Core.Infrastructure;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Repository;
+using MassTransit;
+using MediatR;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -30,6 +32,27 @@ builder.Services.AddTransient<MinimalReferralEndPoints>();
 
 builder.Services.AddSwaggerGen();
 
+
+
+if (builder.Configuration.GetValue<bool>("UseRabbitMQ"))
+{
+    var rabbitMqSettings = builder.Configuration.GetSection(nameof(RabbitMqSettings)).Get<RabbitMqSettings>();
+    builder.Services.AddMassTransit(mt =>
+            mt.UsingRabbitMq((cntxt, cfg) =>
+            {
+                cfg.Host(rabbitMqSettings.Uri, "/", c =>
+                {
+                    c.Username(rabbitMqSettings.UserName);
+                    c.Password(rabbitMqSettings.Password);
+                });
+
+                cfg.ReceiveEndpoint("referralqueue", (c) =>
+                {
+                    c.Consumer<CommandMessageConsumer>();
+                });
+            }));
+}
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
@@ -49,8 +72,6 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    
-
     var genapi = scope.ServiceProvider.GetService<MinimalGeneralEndPoints>();
     if (genapi != null)
         genapi.RegisterMinimalGeneralEndPoints(app);
@@ -58,8 +79,6 @@ using (var scope = app.Services.CreateScope())
     var referralApi = scope.ServiceProvider.GetService<MinimalReferralEndPoints>();
     if (referralApi != null)
         referralApi.RegisterReferralEndPoints(app);
-
-
 
     try
     {
@@ -80,6 +99,11 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+Program.ServiceProvider = app.Services;
+
 app.Run();
 
-public partial class Program { }
+public partial class Program 
+{
+    public static IServiceProvider ServiceProvider { get; set; } = default!;
+}
