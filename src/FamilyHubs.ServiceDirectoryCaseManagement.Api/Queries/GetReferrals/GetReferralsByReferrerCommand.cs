@@ -36,7 +36,7 @@ public class GetReferralsByReferrerCommandHandler : IRequestHandler<GetReferrals
             throw new NotFoundException(nameof(Referral), request.Referrer);
         }
 
-        var results = entities.Select(x => new ReferralDto(
+        var results = await entities.Select(x => new ReferralDto(
             x.Id,
             x.ServiceId,
             x.ServiceName,
@@ -48,7 +48,7 @@ public class GetReferralsByReferrerCommandHandler : IRequestHandler<GetReferrals
             x.Phone,
             x.ReasonForSupport,
             x.Status.Select(x => new ReferralStatusDto(x.Id, x.Status)).ToList()
-            )).ToList();
+            )).ToListAsync();
 
         return results;
     }

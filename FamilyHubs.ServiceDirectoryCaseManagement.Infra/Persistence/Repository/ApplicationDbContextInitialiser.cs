@@ -1,4 +1,5 @@
 ﻿using FamilyHubs.ServiceDirectoryCaseManagement.Core.Entities;
+using FamilyHubs.ServiceDirectoryCaseManagement.Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

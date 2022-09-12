@@ -7,13 +7,14 @@ namespace FamilyHubs.ServiceDirectoryCaseManagement.Core.Entities;
 public class Referral : EntityBase<string>, IAggregateRoot
 {
     private Referral() { }
-    public Referral(string id, string serviceId, string serviceName, string serviceDescription, string serviceAsJson, string fullName, string hasSpecialNeeds, string email, string phone, string reasonForSupport, ICollection<ReferralStatus> status)
+    public Referral(string id, string serviceId, string serviceName, string serviceDescription, string serviceAsJson, string referrer, string fullName, string hasSpecialNeeds, string email, string phone, string reasonForSupport, ICollection<ReferralStatus> status)
     {
         Id = id;
         ServiceId = serviceId;
         ServiceName = serviceName;
         ServiceDescription = serviceDescription;
         ServiceAsJson = serviceAsJson;
+        Referrer = referrer;
         FullName = fullName;
         HasSpecialNeeds = hasSpecialNeeds;
         Email = email;

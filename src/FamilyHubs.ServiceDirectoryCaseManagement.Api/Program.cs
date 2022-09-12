@@ -1,10 +1,8 @@
 using FamilyHubs.ServiceDirectoryCaseManagement.Api;
 using FamilyHubs.ServiceDirectoryCaseManagement.Api.Endpoints;
+using FamilyHubs.ServiceDirectoryCaseManagement.Core.Infrastructure;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra;
-using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Interceptors;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Repository;
-using FamilyHubs.SharedKernel.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -28,6 +26,7 @@ builder.Services.AddEndpointsApiExplorer()
                 .AddApplicationServices();
 
 builder.Services.AddTransient<MinimalGeneralEndPoints>();
+builder.Services.AddTransient<MinimalReferralEndPoints>();
 
 builder.Services.AddSwaggerGen();
 
@@ -52,42 +51,19 @@ using (var scope = app.Services.CreateScope())
 {
     
 
-    var genservice = scope.ServiceProvider.GetService<MinimalGeneralEndPoints>();
-    if (genservice != null)
-        genservice.RegisterMinimalGeneralEndPoints(app);
+    var genapi = scope.ServiceProvider.GetService<MinimalGeneralEndPoints>();
+    if (genapi != null)
+        genapi.RegisterMinimalGeneralEndPoints(app);
+
+    var referralApi = scope.ServiceProvider.GetService<MinimalReferralEndPoints>();
+    if (referralApi != null)
+        referralApi.RegisterReferralEndPoints(app);
+
+
 
     try
     {
-        /*
-        IDomainEventDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
-        AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor = scope.ServiceProvider.GetRequiredService<AuditableEntitySaveChangesInterceptor>();
-
-        
-
-        DbContextOptions<ApplicationDbContext> options;
-
-        if (builder.Configuration.GetValue<bool>("UseInMemoryDatabase"))
-        {
-            options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                            .UseInMemoryDatabase("FH-LAHubDb").Options;
-        }
-        else if (builder.Configuration.GetValue<bool>("UseSqlServerDatabase"))
-        {
-            options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                             .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-                             .Options;
-        }
-        else
-        {
-            options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                             .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-                             .Options;
-        }
-
-        ApplicationDbContext applicationDbContext = new ApplicationDbContext(options, dispatcher, auditableEntitySaveChangesInterceptor);
-        */
-
-        //var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
 
 
         // Seed Database
