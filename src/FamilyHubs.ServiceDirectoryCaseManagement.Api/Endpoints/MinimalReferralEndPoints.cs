@@ -26,11 +26,11 @@ public class MinimalReferralEndPoints
             }
         }).WithMetadata(new SwaggerOperationAttribute("Referrals", "Create Referral") { Tags = new[] { "Referrals" } });
 
-        app.MapGet("api/referrals/{referrer}", async (string referrer, CancellationToken cancellationToken, ISender _mediator) =>
+        app.MapGet("api/referrals/{referrer}", async (string referrer, int? pageNumber, int? pageSize, CancellationToken cancellationToken, ISender _mediator) =>
         {
             try
             {
-                GetReferralsByReferrerCommand request = new(referrer);
+                GetReferralsByReferrerCommand request = new(referrer, pageNumber, pageSize);
                 var result = await _mediator.Send(request, cancellationToken);
                 return result;
             }
