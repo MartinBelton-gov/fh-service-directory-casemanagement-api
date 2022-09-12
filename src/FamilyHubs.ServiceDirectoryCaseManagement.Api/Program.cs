@@ -1,6 +1,10 @@
 using FamilyHubs.ServiceDirectoryCaseManagement.Api;
 using FamilyHubs.ServiceDirectoryCaseManagement.Api.Endpoints;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra;
+using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Interceptors;
+using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Repository;
+using FamilyHubs.SharedKernel.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -54,10 +58,42 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
+        /*
+        IDomainEventDispatcher dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
+        AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor = scope.ServiceProvider.GetRequiredService<AuditableEntitySaveChangesInterceptor>();
+
+        
+
+        DbContextOptions<ApplicationDbContext> options;
+
+        if (builder.Configuration.GetValue<bool>("UseInMemoryDatabase"))
+        {
+            options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                            .UseInMemoryDatabase("FH-LAHubDb").Options;
+        }
+        else if (builder.Configuration.GetValue<bool>("UseSqlServerDatabase"))
+        {
+            options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                             .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                             .Options;
+        }
+        else
+        {
+            options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                             .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                             .Options;
+        }
+
+        ApplicationDbContext applicationDbContext = new ApplicationDbContext(options, dispatcher, auditableEntitySaveChangesInterceptor);
+        */
+
+        //var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+
         // Seed Database
-        //var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
-        //await initialiser.InitialiseAsync(builder.Configuration);
-        //await initialiser.SeedAsync();
+        var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
+        await initialiser.InitialiseAsync(builder.Configuration);
+        await initialiser.SeedAsync();
 
     }
     catch (Exception ex)
