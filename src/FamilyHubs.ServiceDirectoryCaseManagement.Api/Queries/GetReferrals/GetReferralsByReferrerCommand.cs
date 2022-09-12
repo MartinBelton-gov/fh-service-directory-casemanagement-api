@@ -48,6 +48,7 @@ public class GetReferralsByReferrerCommandHandler : IRequestHandler<GetReferrals
             x.ServiceName,
             x.ServiceDescription,
             x.ServiceAsJson,
+            x.Referrer,
             x.FullName,
             x.HasSpecialNeeds,
             x.Email,

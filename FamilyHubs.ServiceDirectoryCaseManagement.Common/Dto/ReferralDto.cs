@@ -3,13 +3,14 @@
 public class ReferralDto
 {
     private ReferralDto() { }
-    public ReferralDto(string id, string serviceId, string serviceName, string serviceDescription, string serviceAsJson, string fullName, string hasSpecialNeeds, string email, string phone, string reasonForSupport, ICollection<ReferralStatusDto> status)
+    public ReferralDto(string id, string serviceId, string serviceName, string serviceDescription, string serviceAsJson, string referrer, string fullName, string hasSpecialNeeds, string email, string phone, string reasonForSupport, ICollection<ReferralStatusDto> status)
     {
         Id = id;
         ServiceId = serviceId;
         ServiceName = serviceName;
         ServiceDescription = serviceDescription;
         ServiceAsJson = serviceAsJson;
+        Referrer = referrer;
         FullName = fullName;
         HasSpecialNeeds = hasSpecialNeeds;
         Email = email;
