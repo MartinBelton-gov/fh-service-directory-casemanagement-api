@@ -1,5 +1,7 @@
-﻿using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Interceptors;
+﻿using FamilyHubs.ServiceDirectoryCaseManagement.Core.Infrastructure;
+using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Interceptors;
 using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Persistence.Repository;
+using FamilyHubs.ServiceDirectoryCaseManagement.Infra.Service;
 using FamilyHubs.SharedKernel;
 using FamilyHubs.SharedKernel.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +21,7 @@ public static class ConfigureServices
         if (configuration.GetValue<bool>("UseInMemoryDatabase"))
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseInMemoryDatabase("LAHubDb"));
+                options.UseInMemoryDatabase("ReferralDb"));
         }
         else if (configuration.GetValue<bool>("UseSqlServerDatabase"))
         {
@@ -34,28 +36,26 @@ public static class ConfigureServices
                     builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
         }
 
-        services.AddScoped<ApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-        /*
         services.AddScoped<ApplicationDbContextInitialiser>();
+       
+        //services
+        //    .AddDefaultIdentity<ApplicationUser>()
+        //    .AddRoles<IdentityRole>()
+        //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services
-            .AddDefaultIdentity<ApplicationUser>()
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
-
-        services.AddIdentityServer()
-            .AddApiAuthorization<ApplicationUser, LAHubDbContext>();
+        //services.AddIdentityServer()
+        //    .AddApiAuthorization<ApplicationUser, LAHubDbContext>();
 
         services.AddTransient<IDateTime, DateTimeService>();
-        services.AddTransient<IIdentityService, IdentityService>();
+        //services.AddTransient<IIdentityService, IdentityService>();
 
-        services.AddAuthentication()
-            .AddIdentityServerJwt();
+        //services.AddAuthentication()
+        //    .AddIdentityServerJwt();
 
-        services.AddAuthorization(options =>
-            options.AddPolicy("CanPurge", policy => policy.RequireRole("Administrator")));
-        */
+        //services.AddAuthorization(options =>
+        //    options.AddPolicy("CanPurge", policy => policy.RequireRole("Administrator")));
 
         return services;
     }

@@ -7,4 +7,5 @@ public interface IApplicationDbContext
 {
     DbSet<Referral> Referrals { get; }
     DbSet<ReferralStatus> ReferralStatuses { get; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
