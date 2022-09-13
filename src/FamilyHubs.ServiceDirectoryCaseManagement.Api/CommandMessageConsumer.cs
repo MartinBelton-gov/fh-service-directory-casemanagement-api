@@ -14,35 +14,37 @@ public class CommandMessageConsumer : IConsumer<CommandMessage>
         var message = context.Message;
         await Console.Out.WriteLineAsync($"Message from Producer : {message.MessageString}");
 
-        if (context != null && context.Message != null && !string.IsNullOrEmpty(context.Message.MessageString))
+        using (var scope = Program.ServiceProvider.CreateScope())
         {
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            ReferralDto dto = JsonSerializer.Deserialize<ReferralDto>(context.Message.MessageString, options: new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-            if (dto != null)
+            ILogger<CommandMessageConsumer>? logger = null;
+
+            try
             {
-                string id = string.Empty;
-                try
+                logger = scope.ServiceProvider.GetService<ILogger<CommandMessageConsumer>>();
+                if (context != null && context.Message != null && !string.IsNullOrEmpty(context.Message.MessageString))
                 {
-                    CreateReferralCommand command = new(dto);
-                    using (var scope = Program.ServiceProvider.CreateScope())
+                    ReferralDto? dto = JsonSerializer.Deserialize<ReferralDto>(context.Message.MessageString, options: new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (dto != null)
                     {
+                        CreateReferralCommand command = new(dto);
                         var mediator = scope.ServiceProvider.GetService<ISender>();
                         if (mediator != null)
                         {
                             var result = await mediator.Send(command, new CancellationToken());
-                            id = result;
                         }
                     }
-
-                        
                 }
-                catch(Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                }
-                
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                if (logger != null)
+                {
+                    logger.LogError(ex, "An error occurred consumming message.");
+                }
+
+                throw;
+            }     
         }  
     }
 }
