@@ -7,9 +7,10 @@ namespace FamilyHubs.ServiceDirectoryCaseManagement.Core.Entities;
 public class Referral : EntityBase<string>, IAggregateRoot
 {
     private Referral() { }
-    public Referral(string id, string serviceId, string serviceName, string serviceDescription, string serviceAsJson, string referrer, string fullName, string hasSpecialNeeds, string email, string phone, string reasonForSupport, ICollection<ReferralStatus> status)
+    public Referral(string id, string organisationId, string serviceId, string serviceName, string serviceDescription, string serviceAsJson, string referrer, string fullName, string hasSpecialNeeds, string email, string phone, string reasonForSupport, ICollection<ReferralStatus> status)
     {
         Id = id;
+        OrganisationId = organisationId;
         ServiceId = serviceId;
         ServiceName = serviceName;
         ServiceDescription = serviceDescription;
@@ -22,6 +23,7 @@ public class Referral : EntityBase<string>, IAggregateRoot
         ReasonForSupport = reasonForSupport;
         Status = status;
     }
+    public string OrganisationId { get; set; } = default!;
     public string ServiceId { get; set; } = default!;
     public string ServiceName { get; set; } = default!;
     public string ServiceDescription { get; set; } = default!;

@@ -8,38 +8,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FamilyHubs.ServiceDirectoryCaseManagement.Api.Queries.GetReferrals;
 
-public class GetReferralsByReferrerCommand : IRequest<PaginatedList<ReferralDto>>
+public class GetReferralsByOrganisationIdCommand : IRequest<PaginatedList<ReferralDto>>
 {
-    public GetReferralsByReferrerCommand(string referrer, int? pageNumber, int? pageSize)
+    public GetReferralsByOrganisationIdCommand(string organisationId, int? pageNumber, int? pageSize)
     {
-        Referrer = referrer;
+        OrganisationId = organisationId;
         PageNumber = (pageNumber != null) ? pageNumber.Value : 1;
         PageSize = (pageSize != null) ? pageSize.Value : 1;
     }
 
-    public string Referrer { get; set; }
-
+    public string OrganisationId { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
 
-public class GetReferralsByReferrerCommandHandler : IRequestHandler<GetReferralsByReferrerCommand, PaginatedList<ReferralDto>>
+public class GetReferralsByOrganisationIdCommandHandler : IRequestHandler<GetReferralsByOrganisationIdCommand, PaginatedList<ReferralDto>>
 {
     private readonly ApplicationDbContext _context;
 
-    public GetReferralsByReferrerCommandHandler(ApplicationDbContext context)
+    public GetReferralsByOrganisationIdCommandHandler(ApplicationDbContext context)
     {
         _context = context;
     }
-    public async Task<PaginatedList<ReferralDto>> Handle(GetReferralsByReferrerCommand request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<ReferralDto>> Handle(GetReferralsByOrganisationIdCommand request, CancellationToken cancellationToken)
     {
         var entities = _context.Referrals
             .Include(x => x.Status)
-            .Where(x => x.Referrer == request.Referrer);
+            .Where(x => x.OrganisationId == request.OrganisationId);
 
         if (entities == null)
         {
-            throw new NotFoundException(nameof(Referral), request.Referrer);
+            throw new NotFoundException(nameof(Referral), request.OrganisationId);
         }
 
         var filteredReferrals = await entities.Select(x => new ReferralDto(
@@ -67,6 +66,6 @@ public class GetReferralsByReferrerCommandHandler : IRequestHandler<GetReferrals
 
         return new PaginatedList<ReferralDto>(filteredReferrals, filteredReferrals.Count, 1, 10);
 
-        
+
     }
 }
